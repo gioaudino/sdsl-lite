@@ -53,7 +53,7 @@ if [ $? != 0 ]; then
 	exit 1
 fi
 
-cmake -DCMAKE_INSTALL_PREFIX="${SDSL_INSTALL_PREFIX}" .. # run cmake 
+cmake -DCMAKE_INSTALL_PREFIX="${SDSL_INSTALL_PREFIX}" .. # run cmake
 if [ $? != 0 ]; then
 	echo "ERROR: CMake build failed."
 	exit 1
@@ -95,7 +95,7 @@ echo "Sample programs can be found in the examples-directory."
 echo "A program 'example.cpp' can be compiled with the command: "
 echo "g++ -std=c++11 -DNDEBUG -O3 [-msse4.2] \\"
 echo "   -I${SDSL_INSTALL_PREFIX}/include -L${SDSL_INSTALL_PREFIX}/lib \\"
-echo "   example.cpp -lsdsl -ldivsufsort -ldivsufsort64"
+echo "   example.cpp -lsdsl -ldivsufsort -ldivsufsort64 -lstxxl"
 echo " "
 echo "Tests in the test-directory"
 echo "A cheat sheet in the extras/cheatsheet-directory."

@@ -28,6 +28,7 @@
 #include "sdsl/bit_vectors.hpp"
 #include "sdsl/k2_tree_helper.hpp"
 #include "sdsl/int_vector_buffer.hpp"
+#include <stxxl>
 
 
 //! Namespace for the succint data structure library
@@ -269,6 +270,109 @@ class k2_tree
 
 		}
 
+
+        //! Build a tree from an edges stxxl::vector
+        /*! This method takes a vector of edges describing the graph
+         *  and the graph size. And takes linear time over the amount of
+         *  edges to build the k_2 representation.
+         *  \param edges A vector with all the edges of the graph, it can
+         *               not be empty.
+         *  \param size Size of the graph, all the nodes in edges must be
+         *              within 0 and size ([0, size[).
+         */
+        void build_from_edges(stxxl::vector<std::tuple<idx_type, idx_type>>& edges,
+							  const size_type size)
+		{
+
+            typedef std::tuple<idx_type, idx_type, size_type, idx_type,
+                    idx_type> t_part_tuple;
+
+            k_k = k;
+            k_height = std::ceil(std::log(size)/std::log(k_k));
+            k_height = k_height > 1 ? k_height : 1; // If size == 0
+            size_type k_2 = std::pow(k_k, 2);
+            bit_vector k_t_ = bit_vector(k_2 * k_height * edges.size(), 0);
+            bit_vector k_l_;
+
+            stxxl::queue<t_part_tuple> q;
+            idx_type t = 0, last_level = 0;
+            idx_type i, j, r_0, c_0, it, c, r;
+            size_type l = std::pow(k_k, k_height - 1);
+            stxxl::vector<idx_type> pos_by_chunk(k_2 + 1, 0);
+
+            q.push(t_part_tuple(0, edges.size(), l, 0, 0));
+
+            while (!q.empty()) {
+                stxxl::vector<idx_type> amount_by_chunk(k_2, 0);
+                std::tie(i, j, l, r_0, c_0) = q.front();
+                q.pop();
+                // Get size for each chunk
+                for (it = i; it < j; it++)
+                    amount_by_chunk[k2_tree_ns::get_chunk_idx(
+                                        std::get<0>(edges[it]), std::get<1>(edges[it]),
+                                        c_0, r_0, l, k_k)] += 1;
+                if (l == 1) {
+                    if (last_level == 0) {
+                        last_level = t;
+                        k_l_ = bit_vector(k_t_.size() - last_level, 0);
+                        k_t_.resize(last_level);
+                        last_level = 1; // if t was 0
+                        t = 0; // Restart counter as we're storing at k_l_ now.
+                    }
+                    for (it = 0; it < k_2; it++,t++)
+                        if (amount_by_chunk[it] != 0)
+                            k_l_[t] = 1;
+                    // At l == 1 we do not put new elements at the queue.
+                    continue;
+                }
+
+                // Set starting position in the vector for each chunk
+                pos_by_chunk[0] = i;
+                for (it = 1; it < k_2; it++)
+                    pos_by_chunk[it] =
+                        pos_by_chunk[it - 1] + amount_by_chunk[it - 1];
+                // To handle the last case when it = k_2 - 1
+                pos_by_chunk[k_2] = j;
+                // Push to the queue every non zero elements chunk
+                for (it = 0; it < k_2; it++,t++)
+                    // If not empty chunk, set bit to 1
+                    if (amount_by_chunk[it] != 0) {
+                        r = it / k_k;
+                        c = it % k_k;
+                        k_t_[t] = 1;
+                        q.push(t_part_tuple(pos_by_chunk[it],
+                                            pos_by_chunk[it + 1],
+                                            l/k_k,
+                                            r_0 + r * l,
+                                            c_0 + c * l));
+                    }
+                idx_type chunk;
+
+                // Sort edges' vector
+                for (unsigned ch = 0; ch < k_2; ch++) {
+                    idx_type be = ch == 0 ? i : pos_by_chunk[ch - 1];
+                    for (it = pos_by_chunk[ch]; it < be + amount_by_chunk[ch];) {
+                        chunk = k2_tree_ns::get_chunk_idx(
+                                    std::get<0>(edges[it]), std::get<1>(edges[it]),
+                                    c_0, r_0, l, k_k);
+
+                        if (pos_by_chunk[chunk] != it)
+                            std::iter_swap(edges.begin() + it,
+                                           edges.begin() + pos_by_chunk[chunk]);
+                        else
+                            it++;
+                        pos_by_chunk[chunk]++;
+                    }
+                }
+            }
+            k_l_.resize(t);
+            k2_tree_ns::build_template_vector<t_bv>(k_t_, k_l_, k_t, k_l);
+
+            k_t_rank = t_rank(&k_t);
+
+		}
+
+
     public:
 
         k2_tree() = default;
@@ -313,6 +417,24 @@ class k2_tree
             assert(edges.size() > 0);
 
             build_from_edges(edges, size);
+        }
+
+        //! Constructor
+        /*! This constructor uses the stxxl library instead of the std library
+         *  in order to store the vector on disk instead of loading into memory.
+         *  This allows the k2_trees to accept huge vectors.
+         *  \param edges A stxxl::vector with all the edges in the graphs. Each
+         *                 edge is a tuple<idx_type, idx_type>. It cannot be empty
+         *  \param size Size of the graph, all the nodes in edges must be
+         *              within 0 and size ([0, size[).
+         */
+        k2_tree(stxxl::vector<std::tuple<idx_type, idx_type>>& edges, const size_type size)
+        {
+            assert(size > 0);
+            assert(edges.size() > 0);
+
+            build_from_edges(edges, size);
+
         }
 
         //! Constructor

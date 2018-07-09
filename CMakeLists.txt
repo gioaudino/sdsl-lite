@@ -122,13 +122,6 @@ add_subdirectory(external)
 add_subdirectory(include)
 add_subdirectory(lib)
 
-# STXXL configuration
-
-set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${STXXL_CXX_FLAGS}")
-# add STXXL includes path
-include_directories(${STXXL_INCLUDE_DIRS})
-# target_link_libraries(project ${STXXL_LIBRARIES})
-
 ## Add doxygen documentation generation target ##
 find_package(Doxygen)
 if(GENERATE_DOC AND DOXYGEN_FOUND)

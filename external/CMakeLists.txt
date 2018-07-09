@@ -25,3 +25,10 @@ endif(NOT EXISTS ${gtest_file})
 
 add_subdirectory(googletest/googletest)
 add_subdirectory(stxxl)
+
+# STXXL configuration
+
+set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${STXXL_CXX_FLAGS}")
+# add STXXL includes path
+include_directories(${STXXL_INCLUDE_DIRS})
+# target_link_libraries(project ${STXXL_LIBRARIES})

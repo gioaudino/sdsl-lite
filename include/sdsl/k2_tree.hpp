@@ -280,7 +280,7 @@ class k2_tree
          *  \param size Size of the graph, all the nodes in edges must be
          *              within 0 and size ([0, size[).
          */
-        void build_from_edges(stxxl::vector<std::tuple<idx_type, idx_type>>& edges,
+        void build_from_xxl(stxxl::vector<std::tuple<idx_type, idx_type>>& edges,
 							  const size_type size, const int ciao)
 		{
             std::cerr << "Building from edges!" << std::endl;
@@ -447,7 +447,7 @@ class k2_tree
             assert(size > 0);
             assert(edges.size() > 0);
 
-            build_from_edges(edges, size, 42);
+            build_from_xxl(edges, size, 42);
 
         }
 

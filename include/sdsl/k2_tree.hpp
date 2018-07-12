@@ -281,7 +281,7 @@ class k2_tree
          *              within 0 and size ([0, size[).
          */
         void build_from_edges(stxxl::vector<std::tuple<idx_type, idx_type>>& edges,
-							  const size_type size)
+							  const size_type size, const int ciao)
 		{
             std::cerr << "Building from edges!" << std::endl;
             typedef std::tuple<idx_type, idx_type, size_type, idx_type,
@@ -447,7 +447,7 @@ class k2_tree
             assert(size > 0);
             assert(edges.size() > 0);
 
-            build_from_edges(edges, size);
+            build_from_edges(edges, size, 42);
 
         }
 

@@ -309,20 +309,20 @@ class k2_tree
             std::cerr << "Charlie. Q size is " << q.size() << std::endl;
 
             while (!q.empty()) {
-                std::cerr << "Golf" << std::endl;
+                // std::cerr << "Golf" << std::endl;
 
                 stxxl::vector<idx_type> amount_by_chunk(k_2);
-                std::cerr << "Hotel" << std::endl;
+                // std::cerr << "Hotel" << std::endl;
                 std::tie(i, j, l, r_0, c_0) = q.front();
-                std::cerr << "India" << std::endl;
+                // std::cerr << "India" << std::endl;
                 q.pop();
-                std::cerr << "Juliet" << std::endl;
+                // std::cerr << "Juliet" << std::endl;
                 // Get size for each chunk
                 for (it = i; it < j; it++){
                     int loop_index = k2_tree_ns::get_chunk_idx(std::get<0>(edges[it]), std::get<1>(edges[it]),c_0, r_0, l, k_k);
                     amount_by_chunk[loop_index] += 1;
                 }
-                std::cerr << "Kilo" << std::endl;
+                // std::cerr << "Kilo" << std::endl;
                 if (l == 1) {
                     if (last_level == 0) {
                         last_level = t;
@@ -337,14 +337,14 @@ class k2_tree
                     // At l == 1 we do not put new elements at the queue.
                     continue;
                 }
-                std::cerr << "Lima" << std::endl;
+                // std::cerr << "Lima" << std::endl;
 
                 // Set starting position in the vector for each chunk
                 pos_by_chunk[0] = i;
                 for (it = 1; it < k_2; it++)
                     pos_by_chunk[it] =
                         pos_by_chunk[it - 1] + amount_by_chunk[it - 1];
-                std::cerr << "Mike" << std::endl;
+                // std::cerr << "Mike" << std::endl;
                 // To handle the last case when it = k_2 - 1
                 pos_by_chunk[k_2] = j;
                 // Push to the queue every non zero elements chunk
@@ -360,7 +360,7 @@ class k2_tree
                                             r_0 + r * l,
                                             c_0 + c * l));
                     }
-                    std::cerr << "November" << std::endl;
+                    // std::cerr << "November" << std::endl;
                 idx_type chunk;
 
                 // Sort edges' vector

@@ -300,7 +300,7 @@ class k2_tree
             idx_type t = 0, last_level = 0;
             idx_type i, j, r_0, c_0, it, c, r;
             size_type l = std::pow(k_k, k_height - 1);
-            stxxl::vector<idx_type> pos_by_chunk(k_2 + 1, 0);
+            stxxl::vector<idx_type> pos_by_chunk(k_2 + 1);
 
             std::cerr << "Bravo" << std::endl;
 
@@ -311,17 +311,17 @@ class k2_tree
             while (!q.empty()) {
                 std::cerr << "Golf" << std::endl;
 
-                stxxl::vector<idx_type> amount_by_chunk(k_2, 0);
+                stxxl::vector<idx_type> amount_by_chunk(k_2);
                 std::cerr << "Hotel" << std::endl;
                 std::tie(i, j, l, r_0, c_0) = q.front();
                 std::cerr << "India" << std::endl;
                 q.pop();
                 std::cerr << "Juliet" << std::endl;
                 // Get size for each chunk
-                for (it = i; it < j; it++)
-                    amount_by_chunk[k2_tree_ns::get_chunk_idx(
-                                        std::get<0>(edges[it]), std::get<1>(edges[it]),
-                                        c_0, r_0, l, k_k)] += 1;
+                for (it = i; it < j; it++){
+                    int loop_index = k2_tree_ns::get_chunk_idx(std::get<0>(edges[it]), std::get<1>(edges[it]),c_0, r_0, l, k_k);
+                    amount_by_chunk[loop_index] += 1;
+                }
                 std::cerr << "Kilo" << std::endl;
                 if (l == 1) {
                     if (last_level == 0) {

@@ -28,7 +28,7 @@
 #include "sdsl/bit_vectors.hpp"
 #include "sdsl/k2_tree_helper.hpp"
 #include "sdsl/int_vector_buffer.hpp"
-#include <stxxl>
+#include <stxxl.h>
 
 
 //! Namespace for the succint data structure library
@@ -283,16 +283,18 @@ class k2_tree
         void build_from_edges(stxxl::vector<std::tuple<idx_type, idx_type>>& edges,
 							  const size_type size)
 		{
-
+            std::cerr << "Building from edges!" << std::endl;
             typedef std::tuple<idx_type, idx_type, size_type, idx_type,
                     idx_type> t_part_tuple;
 
             k_k = k;
-            k_height = std::ceil(std::log(size)/std::log(k_k));
+            k_height = std::ceil(std::log(size)/std::log(k_k)); // log_2 (nodes)
             k_height = k_height > 1 ? k_height : 1; // If size == 0
             size_type k_2 = std::pow(k_k, 2);
             bit_vector k_t_ = bit_vector(k_2 * k_height * edges.size(), 0);
             bit_vector k_l_;
+
+            std::cerr << "Alpha" << std::endl;
 
             stxxl::queue<t_part_tuple> q;
             idx_type t = 0, last_level = 0;
@@ -300,7 +302,11 @@ class k2_tree
             size_type l = std::pow(k_k, k_height - 1);
             stxxl::vector<idx_type> pos_by_chunk(k_2 + 1, 0);
 
+            std::cerr << "Bravo" << std::endl;
+
             q.push(t_part_tuple(0, edges.size(), l, 0, 0));
+
+            std::cerr << "Charlie" << std::endl;
 
             while (!q.empty()) {
                 stxxl::vector<idx_type> amount_by_chunk(k_2, 0);
@@ -365,8 +371,16 @@ class k2_tree
                     }
                 }
             }
+
+            std::cerr << "Delta" << std::endl;
+
             k_l_.resize(t);
+
+            std::cerr << "Echo" << std::endl;
+
             k2_tree_ns::build_template_vector<t_bv>(k_t_, k_l_, k_t, k_l);
+
+            std::cerr << "Foxtrot" << std::endl;
 
             k_t_rank = t_rank(&k_t);
 

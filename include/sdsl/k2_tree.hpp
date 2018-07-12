@@ -281,9 +281,8 @@ class k2_tree
          *              within 0 and size ([0, size[).
          */
         void build_from_xxl(stxxl::vector<std::tuple<idx_type, idx_type>>& edges,
-							  const size_type size, const int ciao)
+							  const size_type size)
 		{
-            std::cerr << "Building from edges!" << std::endl;
             typedef std::tuple<idx_type, idx_type, size_type, idx_type,
                     idx_type> t_part_tuple;
 
@@ -294,35 +293,24 @@ class k2_tree
             bit_vector k_t_ = bit_vector(k_2 * k_height * edges.size(), 0);
             bit_vector k_l_;
 
-            std::cerr << "Alpha" << std::endl;
-
             stxxl::queue<t_part_tuple> q;
             idx_type t = 0, last_level = 0;
             idx_type i, j, r_0, c_0, it, c, r;
             size_type l = std::pow(k_k, k_height - 1);
             stxxl::vector<idx_type> pos_by_chunk(k_2 + 1);
 
-            std::cerr << "Bravo" << std::endl;
-
             q.push(t_part_tuple(0, edges.size(), l, 0, 0));
-
-            std::cerr << "Charlie. Q size is " << q.size() << std::endl;
-
             while (!q.empty()) {
-                // std::cerr << "Golf" << std::endl;
-
                 stxxl::vector<idx_type> amount_by_chunk(k_2);
-                // std::cerr << "Hotel" << std::endl;
                 std::tie(i, j, l, r_0, c_0) = q.front();
-                // std::cerr << "India" << std::endl;
                 q.pop();
-                // std::cerr << "Juliet" << std::endl;
+
                 // Get size for each chunk
                 for (it = i; it < j; it++){
                     int loop_index = k2_tree_ns::get_chunk_idx(std::get<0>(edges[it]), std::get<1>(edges[it]),c_0, r_0, l, k_k);
                     amount_by_chunk[loop_index] += 1;
                 }
-                // std::cerr << "Kilo" << std::endl;
+
                 if (l == 1) {
                     if (last_level == 0) {
                         last_level = t;
@@ -337,14 +325,13 @@ class k2_tree
                     // At l == 1 we do not put new elements at the queue.
                     continue;
                 }
-                // std::cerr << "Lima" << std::endl;
 
                 // Set starting position in the vector for each chunk
                 pos_by_chunk[0] = i;
                 for (it = 1; it < k_2; it++)
                     pos_by_chunk[it] =
                         pos_by_chunk[it - 1] + amount_by_chunk[it - 1];
-                // std::cerr << "Mike" << std::endl;
+
                 // To handle the last case when it = k_2 - 1
                 pos_by_chunk[k_2] = j;
                 // Push to the queue every non zero elements chunk
@@ -360,7 +347,7 @@ class k2_tree
                                             r_0 + r * l,
                                             c_0 + c * l));
                     }
-                    // std::cerr << "November" << std::endl;
+
                 idx_type chunk;
 
                 // Sort edges' vector
@@ -381,15 +368,9 @@ class k2_tree
                 }
             }
 
-            std::cerr << "Delta" << std::endl;
-
             k_l_.resize(t);
 
-            std::cerr << "Echo" << std::endl;
-
             k2_tree_ns::build_template_vector<t_bv>(k_t_, k_l_, k_t, k_l);
-
-            std::cerr << "Foxtrot" << std::endl;
 
             k_t_rank = t_rank(&k_t);
 
@@ -456,7 +437,7 @@ class k2_tree
             assert(size > 0);
             assert(edges.size() > 0);
 
-            build_from_xxl(edges, size, 42);
+            build_from_xxl(edges, size);
 
         }
 
